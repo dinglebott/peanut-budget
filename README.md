@@ -1,10 +1,53 @@
 ## ABOUT PROJECT
-Peanut Budget is a mobile app to help users manage their expenditure and budget. It is built in Flutter and uses Dart as its primary language.
+Peanut Budget is a mobile app to help users manage their expenditure and budget. It is built in Flutter and uses Dart as its primary language.\
 <br/>
 
 ## PROJECT STRUCTURE
-`lib/` is where all the main source code lives, as `.dart` files.
+`lib/` is where all the main source code lives, as `.dart` files.\
 <br/>
 
 ## USAGE
+<br/>
+
+## SETUP GUIDE
+This section documents the steps I took in setting up the development environment on Windows for my Flutter project. I only developed for Android, so the steps for iOS support are not included here.\
+<br/>
+
+**Prerequisites: Have VSCode and Git installed on your system**\
+### Step 1: Install Flutter
+Add the Flutter extension by Dart Code to VSCode. This also installs the Dart extension.\
+Open the command palette (CTRL + SHIFT + P) and select Flutter: New Project. Download the Flutter SDK when prompted, and click Clone Flutter in your desired folder.\
+Once done, add the SDK to your PATH variable.
+### Step 2: Set up Android environment
+From the Android downloads page, scroll to the bottom and find Command Line Tools only. Download and unzip the package.\
+Navigate to `cmdline-tools/` and create a new folder `latest/`. Move the entire contents of `cmdline-tools` into the folder. Your structure should now look like `cmdline-tools/latest/everything`. Run the sdkmanager to download platform-tools.
+```bash
+.\latest\bin\sdkmanager "platform-tools"
+```
+Add `platform-tools/` to your PATH variable.\
+From the Oracle downloads page, download and install JDK 17 or JDK 21.
+### Step 3: Verify all your installations
+You should have Flutter, JDK, and ADB accessible from your terminal. Run to check:
+```bash
+flutter --version
+java -version
+adb --versioin
+```
+### Step 4: Live preview your app
+On your Android device, go to "Developer options". If not enabled, do so by going to Settings > About Phone > Software information and tap "Build number" 7 times.\
+Enable "Wireless debugging". Click "Pair device with pairing code". Now pair your phone with your computer, using the provided IP address and port in the popup:
+```bash
+adb pair <IP-address>:<port>
+# Enter the 6-digit code when prompted
+```
+Next, connect your devices. Use the actual IP address and port of your phone, NOT the one you just used for pairing. This is visible under "Device name" on the Wireless debugging screen.
+```bash
+adb connect <IP-address>:<port>
+```
+Now run your app:
+```bash
+flutter run
+# Select your phone as a device when prompted
+```
+You should see it appear on your phone screen.
 <br/>
