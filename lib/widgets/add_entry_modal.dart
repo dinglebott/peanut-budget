@@ -5,12 +5,14 @@ class AddEntryModal extends StatefulWidget {
   final List<String> categories;
   final void Function(Entry) onSave;
   final void Function(String) onAddCategory;
+  final bool initialIsExpense;
 
   const AddEntryModal({
     super.key,
     required this.categories,
     required this.onSave,
     required this.onAddCategory,
+    this.initialIsExpense = true,
   });
 
   @override
@@ -25,13 +27,14 @@ class _AddEntryModalState extends State<AddEntryModal> {
   late List<String> _categories;
   String? _selectedCategory;
   DateTime _date = DateTime.now();
-  bool _isExpense = true;
+  late bool _isExpense;
   bool _showCustomField = false;
 
   @override
   void initState() {
     super.initState();
     _categories = List.of(widget.categories);
+    _isExpense = widget.initialIsExpense;
   }
 
   @override
@@ -102,24 +105,15 @@ class _AddEntryModalState extends State<AddEntryModal> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Add Entry', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 16),
-
-          SegmentedButton<bool>(
-            segments: const [
-              ButtonSegment(
-                value: true,
-                label: Text('Expense'),
-                icon: Icon(Icons.arrow_upward),
-              ),
-              ButtonSegment(
-                value: false,
-                label: Text('Income'),
-                icon: Icon(Icons.arrow_downward),
-              ),
-            ],
-            selected: {_isExpense},
-            onSelectionChanged: (v) => setState(() => _isExpense = v.first),
+          Text(
+            _isExpense ? 'Add Expense' : 'Add Income',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 10),
+          Divider(
+            thickness: 4,
+            height: 4,
+            color: _isExpense ? Colors.red.shade400 : Colors.green,
           ),
           const SizedBox(height: 16),
 

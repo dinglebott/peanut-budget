@@ -36,6 +36,12 @@ class DashboardScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _AddButtons(
+            categories: categories,
+            onAddEntry: onAddEntry,
+            onAddCategory: onAddCategory,
+          ),
+          const SizedBox(height: 12),
           _SummaryCard(
             title: 'This Week',
             income: _total(false, weekStart),
@@ -55,18 +61,62 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (_) => AddEntryModal(
-            categories: categories,
-            onSave: onAddEntry,
-            onAddCategory: onAddCategory,
+    );
+  }
+}
+
+class _AddButtons extends StatelessWidget {
+  final List<String> categories;
+  final void Function(Entry) onAddEntry;
+  final void Function(String) onAddCategory;
+
+  const _AddButtons({
+    required this.categories,
+    required this.onAddEntry,
+    required this.onAddCategory,
+  });
+
+  void _open(BuildContext context, bool isExpense) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => AddEntryModal(
+        categories: categories,
+        onSave: onAddEntry,
+        onAddCategory: onAddCategory,
+        initialIsExpense: isExpense,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: () => _open(context, true),
+            icon: const Icon(Icons.arrow_upward),
+            label: const Text('Add Expense'),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade400,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
           ),
         ),
-        child: const Icon(Icons.add),
-      ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: () => _open(context, false),
+            icon: const Icon(Icons.arrow_downward),
+            label: const Text('Add Income'),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -97,11 +147,11 @@ class _SummaryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _Stat(label: 'Income', amount: income, color: Colors.green),
-                _Stat(label: 'Expenses', amount: expenses, color: Colors.red),
+                _Stat(label: 'Expenses', amount: expenses, color: Colors.red.shade400),
                 _Stat(
                   label: 'Net',
                   amount: net,
-                  color: net >= 0 ? Colors.green : Colors.red,
+                  color: net >= 0 ? Colors.green : Colors.red.shade400,
                 ),
               ],
             ),
