@@ -24,19 +24,21 @@ Add the Flutter extension by Dart Code to VSCode. This also installs the Dart ex
 Open the command palette (CTRL + SHIFT + P) and select Flutter: New Project. Download the Flutter SDK when prompted, and click Clone Flutter in your desired folder.\
 Once done, add the SDK to your PATH variable.
 ### Step 2: Set up Android environment
+From the Oracle downloads page, download and install JDK 17 or JDK 21.\
 From the Android downloads page, scroll to the bottom and find Command Line Tools only. Download and unzip the package.\
-Navigate to `cmdline-tools/` and create a new folder `latest/`. Move the entire contents of `cmdline-tools` into the folder. Your structure should now look like `cmdline-tools/latest/everything`. Run the sdkmanager to download platform-tools.
+Navigate to `cmdline-tools/` and create a new folder `latest/`. Move the entire contents of `cmdline-tools` into the folder. Your structure should now look like `cmdline-tools/latest/everything`.\
+Then, run the sdkmanager to download the Android SDK.
 ```bash
-.\latest\bin\sdkmanager "platform-tools"
+.\latest\bin\sdkmanager.bat "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 ```
-Add `platform-tools/` to your PATH variable.\
-From the Oracle downloads page, download and install JDK 17 or JDK 21.
+**NOTE:** The versions you require may be different. Run `flutter doctor` in your terminal to check that Flutter has registered a valid Android SDK. You may need to point Flutter at your Android SDK installation folder with `flutter config --android-sdk path\to\sdk-folder`.\
+Finally, add `platform-tools/` to your PATH variable.
 ### Step 3: Verify all your installations
 You should have Flutter, JDK, and ADB accessible from your terminal. Run to check:
 ```bash
 flutter --version
 java -version
-adb --versioin
+adb --version
 ```
 ### Step 4: Live preview your app
 First, connect both your Android device and computer to the same WiFi network.\
