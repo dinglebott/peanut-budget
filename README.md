@@ -72,9 +72,15 @@ You should see it appear on your phone screen.\
 This section is a reference for steps needed to deploy to mobile platforms (main focus on Android).
 
 ### APK-only deployment
-App display name - `android/app/src/main/AndroidManifest.xml`, the name that's displayed under the app icon
-App ID (package identifier) - `android/app/build.gradle.kts`, something like "com.developername.appname"
-Version number/version code - `pubspec.yaml`
-App icon - `pubspec.yaml`, fill in the 3 filepaths `image_path`, `adaptive_icon_foreground`, `adaptive_icon_background`
-
+App display name - Set in `android/app/src/main/AndroidManifest.xml`, the name that's displayed under the app icon
+App ID (package identifier) - Set in `android/app/build.gradle.kts`, something like "com.developername.appname"
+Version number/version code - Set in `pubspec.yaml`
+App icon - In `pubspec.yaml`, fill in the 3 filepaths `image_path`, `adaptive_icon_foreground`, `adaptive_icon_background`
+Signing APK - Generate a keystore using keytool, then set up the signing in `android/key.properties` and `android/app/build.gradle.kts`. If the keystore file is moved, update the `storeFile=` line in `key.properties`.
+Building - Remember to bump the version name AND version code (version code must always bump by exactly 1). Keystore file and applicationId must never change.
+```bash
+flutter build apk --release
+```
+The output APK lands in `build/app/outputs/flutter-apk/app-release.apk`, and it overwrites the existing APK file. Local practice: copy the file to `apk-releases/` in root.\
+Note also: the `build/` folder is gitignored and will be wiped by flutter clean.
 </br>

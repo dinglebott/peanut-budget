@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Peanut Budget',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         useMaterial3: true,
       ),
       home: const MainShell(),
