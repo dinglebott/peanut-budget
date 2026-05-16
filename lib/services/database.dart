@@ -45,4 +45,9 @@ class DatabaseService {
     final rows = await db.query('entries', orderBy: 'date DESC');
     return rows.map(Entry.fromMap).toList();
   }
+
+  Future<void> deleteEntry(String id) async {
+    final db = await _database;
+    await db.delete('entries', where: 'id = ?', whereArgs: [id]);
+  }
 }

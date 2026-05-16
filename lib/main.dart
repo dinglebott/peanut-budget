@@ -78,6 +78,11 @@ class _MainShellState extends State<MainShell> {
     setState(() => _categories = updated);
   }
 
+  Future<void> _deleteEntry(String id) async {
+    await _db.deleteEntry(id);
+    setState(() => _entries.removeWhere((e) => e.id == id));
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -92,7 +97,7 @@ class _MainShellState extends State<MainShell> {
         onAddCategory: _addCategory,
         onDeleteCategory: _deleteCategory,
       ),
-      HistoryScreen(entries: _entries),
+      HistoryScreen(entries: _entries, onDeleteEntry: _deleteEntry),
     ];
 
     return Scaffold(

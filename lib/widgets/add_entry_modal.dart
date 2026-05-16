@@ -140,7 +140,7 @@ class _AddEntryModalState extends State<AddEntryModal> {
               ),
               const DropdownMenuItem(
                 value: '__custom__',
-                child: Text('+ Add custom category'),
+                child: Text('+ Add new category'),
               ),
             ],
             onChanged: (value) {

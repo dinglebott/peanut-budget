@@ -146,8 +146,8 @@ class _SummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _Stat(label: 'Income', amount: income, color: Colors.green),
                 _Stat(label: 'Expenses', amount: expenses, color: Colors.red.shade400),
+                _Stat(label: 'Income', amount: income, color: Colors.green),
                 _Stat(
                   label: 'Net',
                   amount: net,
@@ -235,7 +235,7 @@ class _CategoriesCardState extends State<_CategoriesCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Categories',
+                  'Manage Categories',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 IconButton(
