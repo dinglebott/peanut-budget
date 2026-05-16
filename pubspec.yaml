@@ -1,7 +1,7 @@
 name: peanut_budget
-description: "A new Flutter project."
+description: "Budgeting app built with Flutter and Dart. It helps users manage their finances by tracking expenses and income."
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.11.5
@@ -17,6 +17,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon.png"
 
 flutter:
   uses-material-design: true

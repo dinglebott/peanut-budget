@@ -2,6 +2,7 @@
 Peanut Budget is a mobile app to help users manage their expenditure and budget. It is built in Flutter and uses Dart as its primary language.\
 <br/>
 
+
 ## PROJECT STRUCTURE
 `lib/` is where all the main source code lives, as `.dart` files.\
 - `models/entry.dart` contains the data class for entries
@@ -10,19 +11,23 @@ Peanut Budget is a mobile app to help users manage their expenditure and budget.
 - `widgets/add_entry_modal.dart` is the modal window for adding entries
 <br/>
 
+
 ## USAGE
 To preview the app live, do `flutter run` in your terminal and select the appropriate device. For help with Android setup, see below.\
 <br/>
+
 
 ## SETUP GUIDE
 This section documents the steps I took in setting up the development environment on Windows for my Flutter project. I only developed for Android, so the steps for iOS support are not included here.\
 <br/>
 
 **Prerequisites: Have VSCode and Git installed on your system**
+
 ### Step 1: Install Flutter
 Add the Flutter extension by Dart Code to VSCode. This also installs the Dart extension.\
 Open the command palette (CTRL + SHIFT + P) and select Flutter: New Project. Download the Flutter SDK when prompted, and click Clone Flutter in your desired folder.\
 Once done, add the SDK to your PATH variable.
+
 ### Step 2: Set up Android environment
 From the Oracle downloads page, download and install JDK 17 or JDK 21.\
 From the Android downloads page, scroll to the bottom and find Command Line Tools only. Download and unzip the package.\
@@ -33,6 +38,7 @@ Then, run the sdkmanager to download the Android SDK.
 ```
 **NOTE:** The versions you require may be different. Run `flutter doctor` in your terminal to check that Flutter has registered a valid Android SDK. You may need to point Flutter at your Android SDK installation folder with `flutter config --android-sdk path\to\sdk-folder`.\
 Finally, add `platform-tools/` to your PATH variable.
+
 ### Step 3: Verify all your installations
 You should have Flutter, JDK, and ADB accessible from your terminal. Run to check:
 ```bash
@@ -40,6 +46,7 @@ flutter --version
 java -version
 adb --version
 ```
+
 ### Step 4: Live preview your app
 First, connect both your Android device and computer to the same WiFi network.\
 On your Android device, go to "Developer options". If not enabled, do so by going to Settings > About Phone > Software information and tapping "Build number" 7 times.\
@@ -59,3 +66,15 @@ flutter run
 ```
 You should see it appear on your phone screen.\
 <br/>
+
+
+## DEPLOYMENT GUIDE
+This section is a reference for steps needed to deploy to mobile platforms (main focus on Android).
+
+### APK-only deployment
+App display name - `android/app/src/main/AndroidManifest.xml`, the name that's displayed under the app icon
+App ID (package identifier) - `android/app/build.gradle.kts`, something like "com.developername.appname"
+Version number/version code - `pubspec.yaml`
+App icon - `pubspec.yaml`, fill in the 3 filepaths `image_path`, `adaptive_icon_foreground`, `adaptive_icon_background`
+
+</br>
