@@ -1,17 +1,43 @@
 import 'package:flutter/material.dart';
 import '../models/entry.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   final List<Entry> entries;
+  final List<String> categories;
   final void Function(String) onDeleteEntry;
 
   const HistoryScreen({
     super.key,
     required this.entries,
+    required this.categories,
     required this.onDeleteEntry,
   });
 
-  List<_MonthSummary> _buildSummaries() {
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  final Set<String> _selectedCategories = {};
+
+  @override
+  void didUpdateWidget(HistoryScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If a category was deleted from Dashboard, drop it from the active filter
+    // so the user isn't stuck with an uncheckable filter entry.
+    if (oldWidget.categories != widget.categories) {
+      _selectedCategories.retainAll(widget.categories);
+    }
+  }
+
+  List<Entry> get _filteredEntries {
+    if (_selectedCategories.isEmpty) return widget.entries;
+    return widget.entries
+        .where((e) => _selectedCategories.contains(e.category))
+        .toList();
+  }
+
+  List<_MonthSummary> _buildSummaries(List<Entry> entries) {
     final Map<String, _MonthSummary> map = {};
 
     for (final entry in entries) {
@@ -42,23 +68,133 @@ class HistoryScreen extends StatelessWidget {
     return summaries;
   }
 
+  Future<void> _openFilterDialog() async {
+    // local copy for the dialog so changes only apply on confirm
+    final draft = Set<String>.from(_selectedCategories);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return AlertDialog(
+            title: const Text('Filter by category'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: widget.categories.map((cat) {
+                  return CheckboxListTile(
+                    title: Text(cat),
+                    value: draft.contains(cat),
+                    onChanged: (checked) {
+                      setDialogState(() {
+                        if (checked == true) {
+                          draft.add(cat);
+                        } else {
+                          draft.remove(cat);
+                        }
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                    dense: true,
+                  );
+                }).toList(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Apply'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _selectedCategories
+          ..clear()
+          ..addAll(draft);
+      });
+    }
+  }
+
+  String get _filterLabel {
+    if (_selectedCategories.isEmpty) return 'All categories';
+    if (_selectedCategories.length == 1) return _selectedCategories.first;
+    return '${_selectedCategories.length} categories';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final summaries = _buildSummaries();
+    final theme = Theme.of(context);
+    final summaries = _buildSummaries(_filteredEntries);
+    final isFiltered = _selectedCategories.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(title: const Text('History')),
-      body: summaries.isEmpty
-          ? const Center(child: Text('No entries yet.'))
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: summaries.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) => _MonthCard(
-                summary: summaries[index],
-                onDeleteEntry: onDeleteEntry,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+            child: OutlinedButton.icon(
+              onPressed: widget.categories.isEmpty ? null : _openFilterDialog,
+              icon: Icon(
+                Icons.filter_list,
+                size: 18,
+                color: isFiltered
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              label: Text(
+                _filterLabel,
+                style: TextStyle(
+                  color: isFiltered
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                alignment: Alignment.centerLeft,
+                side: BorderSide(
+                  color: isFiltered
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.outline,
+                ),
               ),
             ),
+          ),
+          const Divider(height: 16),
+          Expanded(
+            child: summaries.isEmpty
+                ? Center(
+                    child: Text(
+                      isFiltered
+                          ? 'No entries for the selected categories.'
+                          : 'No entries yet.',
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    itemCount: summaries.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) => _MonthCard(
+                      key: ValueKey(
+                        '${summaries[index].year}-${summaries[index].month}',
+                      ),
+                      summary: summaries[index],
+                      onDeleteEntry: widget.onDeleteEntry,
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -87,7 +223,7 @@ class _MonthCard extends StatefulWidget {
   final _MonthSummary summary;
   final void Function(String) onDeleteEntry;
 
-  const _MonthCard({required this.summary, required this.onDeleteEntry});
+  const _MonthCard({super.key, required this.summary, required this.onDeleteEntry});
 
   @override
   State<_MonthCard> createState() => _MonthCardState();
@@ -136,13 +272,15 @@ class _MonthCardState extends State<_MonthCard> {
                   children: [
                     _Stat(
                       label: 'Spent',
-                      value: '\$${widget.summary.totalExpense.toStringAsFixed(2)}',
+                      value:
+                          '\$${widget.summary.totalExpense.toStringAsFixed(2)}',
                       valueColor: Colors.red.shade400,
                     ),
                     const SizedBox(width: 24),
                     _Stat(
                       label: 'Earned',
-                      value: '\$${widget.summary.totalIncome.toStringAsFixed(2)}',
+                      value:
+                          '\$${widget.summary.totalIncome.toStringAsFixed(2)}',
                       valueColor: Colors.green,
                     ),
                     const Spacer(),
@@ -187,8 +325,7 @@ class _EntryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final amountColor =
-        entry.isExpense ? Colors.red.shade400 : Colors.green;
+    final amountColor = entry.isExpense ? Colors.red.shade400 : Colors.green;
     final amountLabel = entry.isExpense
         ? '-\$${entry.amount.toStringAsFixed(2)}'
         : '+\$${entry.amount.toStringAsFixed(2)}';

@@ -97,7 +97,11 @@ class _MainShellState extends State<MainShell> {
         onAddCategory: _addCategory,
         onDeleteCategory: _deleteCategory,
       ),
-      HistoryScreen(entries: _entries, onDeleteEntry: _deleteEntry),
+      HistoryScreen(
+        entries: _entries,
+        categories: _categories,
+        onDeleteEntry: _deleteEntry,
+      ),
     ];
 
     return Scaffold(
