@@ -20,8 +20,8 @@ For wireless Android debugging, connect via ADB: `adb connect <device-ip>:5555` 
 
 ### Data layer
 
-- `services/database.dart` — SQLite singleton (`DatabaseService.instance`) for `Entry` records. Table: `entries`. Methods: `insertEntry`, `getAllEntries` (sorted by date DESC).
-- `services/category_store.dart` — SharedPreferences wrapper for the user's category list (stored as `List<String>` under key `'categories'`). Defaults: Meals, Transport, Leisure.
+- `services/database.dart` — SQLite singleton (`DatabaseService.instance`) for `Entry` records. Table: `entries`. Methods: `insertEntry`, `getAllEntries` (sorted by date DESC), `deleteEntry`.
+- `services/category_store.dart` — SharedPreferences wrapper for the user's category list (stored as `List<String>` under key `'categories'`). Defaults: Meals, Transport, Leisure. Categories are referenced by string only — entries hold the category name verbatim, so deleting a category does not touch existing entries (re-adding the exact same name restores the linkage).
 
 ### Model
 
@@ -31,9 +31,9 @@ For wireless Android debugging, connect via ADB: `adb connect <device-ip>:5555` 
 
 Bottom `NavigationBar` with two tabs managed by index in `MainShell`:
 
-1. **Dashboard** (`screens/dashboard.dart`) — Weekly/monthly summary cards (`_SummaryCard`/`_Stat`), category list with add/delete, FAB to open `AddEntryModal`.
-2. **History** (`screens/history.dart`) — Placeholder, not yet implemented.
+1. **Dashboard** (`screens/dashboard.dart`) — Two top buttons (`_AddButtons`: Add Expense / Add Income) that open `AddEntryModal` with the appropriate type preset. Weekly/monthly summary cards (`_SummaryCard`/`_Stat`) and a category list (`_CategoriesCard`) with inline add and a confirmation dialog on delete.
+2. **History** (`screens/history.dart`) — Entries grouped into expandable monthly cards (`_MonthCard`), sorted newest-first. Each month shows totals (spent / earned / net) and, when expanded, a list of `_EntryRow` items with per-entry delete (with confirmation). A top filter button opens a multi-select dialog over the current categories; deleted categories are pruned from the active filter in `didUpdateWidget`.
 
 ### Widgets
 
-- `widgets/add_entry_modal.dart` — Bottom-sheet modal for new entries. Supports expense/income toggle, inline category creation, date picker. On submit, calls the callback passed from `MainShell` which writes to SQLite and updates state.
+- `widgets/add_entry_modal.dart` — Bottom-sheet modal for new entries. Type (expense vs income) is fixed per open via `initialIsExpense`. Supports inline category creation, date picker (capped at today), and validation: invalid/missing fields surface in an `AlertDialog` rather than failing silently. The modal keeps a local mirror of `categories` because `showModalBottomSheet` is on a separate route and does not rebuild from parent state changes. On submit, calls the callback passed from `MainShell` which writes to SQLite and updates state.

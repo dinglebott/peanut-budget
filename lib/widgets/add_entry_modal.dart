@@ -70,13 +70,40 @@ class _AddEntryModalState extends State<AddEntryModal> {
   void _save() {
     final title = _titleController.text.trim();
     final amount = double.tryParse(_amountController.text.trim());
-    if (title.isEmpty || amount == null || amount <= 0 || _selectedCategory == null) {
+    final issues = <String>[];
+    if (title.isEmpty) issues.add('Title is required');
+    if (_selectedCategory == null) issues.add('Category is required');
+    if (amount == null) {
+      issues.add('Amount must be a valid number');
+    } else if (amount <= 0) {
+      issues.add('Amount must be greater than zero');
+    }
+
+    if (issues.isNotEmpty) {
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Missing information'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: issues.map((i) => Text('• $i')).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
       return;
     }
+
     widget.onSave(Entry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
-      amount: amount,
+      amount: amount!,
       category: _selectedCategory!,
       isExpense: _isExpense,
       date: _date,

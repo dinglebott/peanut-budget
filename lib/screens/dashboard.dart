@@ -259,7 +259,31 @@ class _CategoriesCardState extends State<_CategoriesCard> {
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
                       tooltip: 'Delete',
-                      onPressed: () => widget.onDelete(c),
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Delete category?'),
+                            content: Text(
+                              'Remove "$c" from your category list. Existing entries will keep this label.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red.shade400),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed == true) widget.onDelete(c);
+                      },
                     ),
                   ],
                 ),
